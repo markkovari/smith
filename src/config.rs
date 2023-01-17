@@ -6,9 +6,11 @@ extern crate dirs;
 #[derive(Debug)]
 pub struct Config {
     /// base folder path
-    base_path: String,
+    pub base_path: String,
     /// pattern to match
-    patterns: Vec<String>,
+    pub patterns: Vec<String>,
+    /// pattern to skips
+    pub skips: Vec<String>,
 }
 
 impl Config {
@@ -24,20 +26,21 @@ impl Config {
     /// let config = Config::new("path/to/base/folder", "pattern");
     /// ```
     /// panics if `base_path` or `pattern` is empty
-    pub fn new(base_path: &str, patterns: Vec<String>) -> Self {
+    pub fn new(base_path: &str, patterns: Vec<String>, skips: Vec<String>) -> Self {
         if base_path.is_empty() || patterns.is_empty() {
             panic!("base_path and pattern must not be empty");
         }
         Self {
             base_path: base_path.to_string(),
             patterns,
+            skips,
         }
     }
 
     /// Create a new Config from a pattern, where the default path is the HOME directory
     /// # Arguments
     /// * `pattern` - pattern to match
-    pub fn from_pattern(patterns: Vec<String>) -> Self {
+    pub fn from_pattern(patterns: Vec<String>, skips: Vec<String>) -> Self {
         if patterns.is_empty() {
             panic!("pattern must not be empty");
         }
@@ -48,10 +51,15 @@ impl Config {
                 .unwrap()
                 .to_owned(),
             patterns,
+            skips,
         }
     }
 
-    pub fn from_extended_base_path_and_pattern(extended_path: &str, patterns: Vec<String>) -> Self {
+    pub fn from_extended_base_path_and_pattern(
+        extended_path: &str,
+        patterns: Vec<String>,
+        skips: Vec<String>,
+    ) -> Self {
         if extended_path.is_empty() || patterns.is_empty() {
             panic!("base_path and pattern must not be empty");
         }
@@ -63,6 +71,6 @@ impl Config {
         let mut default_path = std::path::Path::new(&default_home);
         let binding = default_path.join(extended_path);
         default_path = binding.as_path();
-        Self::new(default_path.to_str().unwrap(), patterns)
+        Self::new(default_path.to_str().unwrap(), patterns, skips)
     }
 }
