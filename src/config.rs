@@ -65,8 +65,6 @@ impl Config {
         }
         let default_home = dirs::home_dir()
             .expect("home directory not found")
-            .to_str()
-            .unwrap()
             .to_owned();
         let mut default_path = std::path::Path::new(&default_home);
         let binding = default_path.join(extended_path);
