@@ -1,9 +1,11 @@
 use std::os;
 
+use serde::{Deserialize, Serialize};
+
 extern crate dirs;
 
 /// Configuration for the application
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     /// base folder path
     pub base_path: String,
@@ -12,6 +14,8 @@ pub struct Config {
     /// pattern to skips
     pub skips: Vec<String>,
 }
+
+const DEFAULT_CONFIG_PATH: &str = "~/.config/smith/config.yaml";
 
 impl Config {
     /// Create a new Config
@@ -35,6 +39,17 @@ impl Config {
             patterns,
             skips,
         }
+    }
+
+    /// Read a Config from the default config file path
+    /// # Returns
+    /// * `Config` - new Config
+    pub fn read() -> Result<Self, serde_yaml::Error> {
+        let config_path = std::path::Path::new(DEFAULT_CONFIG_PATH);
+        let config_file =
+            std::fs::File::open(config_path).expect("You don't have a config file yet");
+        let config: Self = serde_yaml::from_reader(config_file)?;
+        Ok(config)
     }
 
     /// Create a new Config from a pattern, where the default path is the HOME directory
